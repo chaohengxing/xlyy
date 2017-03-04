@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aygxy.xlyy.user.dao.UserMapper">
+	<resultMap type="com.aygxy.xlyy.user.entity.User" id="UserRM">
+		<id property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="account" column="account" jdbcType="VARCHAR"/>
+		<result property="password" column="password" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="com.aygxy.xlyy.user.entity.TeacherInfo" id="TeacherRM">
+		<id property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="teacherNickName" column="teacherNickName" jdbcType="VARCHAR"/>
+		<result property="userType" column="userType" jdbcType="INTEGER"/>
+		<result property="teacherIntro" column="teacherIntro" jdbcType="VARCHAR"/>
+		<result property="teacherIcon" column="teacherIcon" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="com.aygxy.xlyy.user.entity.StudentInfo" id="StudentRM">
+		<id property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="userType" column="userType" jdbcType="INTEGER"/>
+		<result property="userClass" column="userClass" jdbcType="VARCHAR"/>
+		<result property="userMajor" column="userMajor" jdbcType="VARCHAR"/>
+		<result property="registerTime" column="registerTime" jdbcType="DATE"/>
+		<result property="stuIcon" column="stuIcon" jdbcType="VARCHAR"/>
+		<result property="stuStatus" column="stuStatus" jdbcType="INTEGER"/>
+		<result property="stuNickName" column="stuNickName" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="findUserById" resultMap="UserRM">
+		select * from account_ where(id=#{id})
+	</select>	
+	
+	<select id="login" resultMap="UserRM">
+		select * from account_ where(account=#{userName} and password=#{password})
+	</select>	
+	<select id="getTeacherInfo" resultMap="TeacherRM">
+		select * from teacher_info where(id=#{id})
+	</select>	
+	<select id="getTeacherInfoList" resultMap="TeacherRM">
+		select * from teacher_info
+	</select>	
+	
+	
+	
+	<select id="getStudentInfo" resultMap="StudentRM">
+		select * from student_info where(id=#{id})
+	</select>	
+	
+	<update id="updateStudentInfo">
+	
+	   update student_info set stuIcon = #{stuIcon},stuNickName = #{stuNickName},sex = #{sex},userClass = #{userClass},userMajor = #{userMajor}
+	   where id = #{id}
+	
+	</update>
+	
+		
+	<update id="updateTeacherInfo">
+	
+	   update teacher_info set teacherIcon = #{teacherIcon},teacherNickName = #{teacherNickName},sex = #{sex},teacherIntro = #{teacherIntro}
+	   	   where id = #{id}
+	
+	</update>
+	
+	
+	
+	
+</mapper>

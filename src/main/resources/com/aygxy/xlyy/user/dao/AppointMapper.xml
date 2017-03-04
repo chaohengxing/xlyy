@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aygxy.xlyy.user.dao.AppointMapper">
+	<resultMap type="com.aygxy.xlyy.user.entity.TimeTemplate" id="TimeTemplateRM">
+		<id property="id" column="id" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getTimeTemplate" resultMap="TimeTemplateRM">
+		select * from time_template
+	</select>	
+	
+	<resultMap type="com.aygxy.xlyy.user.entity.FreeTime" id="FreeTimeRM">
+		<id property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="timeDate" column="timeDate" jdbcType="DATE"/>
+	    <association property="timeTemplate" column="timeId" javaType="com.aygxy.xlyy.user.entity.TimeTemplate" select="getTimeTemplateOfId"></association>
+	</resultMap>
+	<select id="getTimeTemplateOfId" parameterType="com.aygxy.xlyy.user.entity.TimeTemplate" resultType="com.aygxy.xlyy.user.entity.TimeTemplate">
+         select * from time_template where id=#{id}
+      </select>
+	<select id="getFreeTimeOfTimeDate" resultMap="FreeTimeRM">
+		select * from freetime where(timeDate in
+		 <foreach collection="timeDates" item="timeDates" index="index" open="(" separator="," close=")">
+                    #{timeDates}
+          </foreach>
+		)
+	</select>	
+	
+	<select id="getTeacherInfoOfFreeTime" resultMap="FreeTimeRM">
+		select * from freetime where(timeDate=#{timeDate} and timeId=#{timeId})
+	</select>
+	
+	 <insert id="planFreeTime" parameterType="com.aygxy.xlyy.user.entity.FreeTime" 
+        useGeneratedKeys="false" > 
+        insert into freetime(id,teacherId,timeDate,timeId)  
+             values(#{id},#{teacherId},#{timeDate},#{timeId})  
+     </insert>
+             
+     <insert id="sendAppoint" parameterType="com.aygxy.xlyy.user.entity.Appoint" 
+        useGeneratedKeys="false" > 
+        insert into appoint(id,stuId,teacherId,freeTimeId,appointTime)  
+             values(#{id},#{stuId},#{teacherId},#{freeTimeId},#{appointTime})  
+     </insert>  
+     
+     
+     
+     
+     <resultMap type="com.aygxy.xlyy.user.entity.Appoint" id="AppointRM">
+		<id property="id" column="id" jdbcType="VARCHAR"/>
+		<association property="freeTimeInfo" column="freeTimeId" javaType="com.aygxy.xlyy.user.entity.FreeTime" select="getFreeTimeOfId"></association>
+	</resultMap>
+     <select id="getStudentAppointWithFreeTime" resultMap="AppointRM">
+		SELECT * FROM appoint WHERE (stuId = #{stuId} AND freeTimeId IN (
+          SELECT id FROM freetime WHERE (timeDate IN 
+           <foreach collection="timeDates" item="timeDates" index="index" open="(" separator="," close=")">
+                    #{timeDates}
+          </foreach>
+          )
+        ))
+	</select>
+	
+ <resultMap type="com.aygxy.xlyy.user.entity.Appoint" id="AppointRM2">
+		<id property="id" column="id" jdbcType="VARCHAR"/>
+				<result property="stuId" column="stuId" jdbcType="VARCHAR"/>
+		
+	</resultMap>
+	 <select id="getAppointWithStuIdAndFreetimeId" resultMap="AppointRM2">
+		SELECT * FROM appoint WHERE (stuId = #{stuId} AND freeTimeId = #{freeTimeId} )
+	</select>	
+		
+	
+ <select id="getFreeTimeOfId" parameterType="com.aygxy.xlyy.user.entity.FreeTime" resultType="com.aygxy.xlyy.user.entity.FreeTime">
+         select * from freetime where id=#{id}
+      </select>
+     	
+ <select id="getFreeTimeOfteacherIdAndTimeIdAndTimeDate" parameterType="com.aygxy.xlyy.user.entity.FreeTime" resultType="com.aygxy.xlyy.user.entity.FreeTime">
+         select * from freetime where (teacherId=#{teacherId} and timeId = #{timeId} and timeDate = #{timeDate})
+      </select>
+     
+</mapper>

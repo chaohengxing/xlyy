@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aygxy.xlyy.user.dao.JtMapper">
+	<resultMap type="com.aygxy.xlyy.user.entity.JtBean" id="JtRM">
+		<id property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="jtInfo" column="jtInfo" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+    <select id="getJtList" resultMap="JtRM">
+		select * from jt
+	</select>	
+	  <select id="getMyJtList" resultMap="JtRM">
+		select * from jt where(userId=#{userId})
+	</select>
+	
+	 <!-- 定义结果集 试卷下的问题 -->
+      <resultMap type="com.aygxy.xlyy.user.entity.JtBean" id="jtInfoMap">
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+	    <collection property="discussJts" column="id" javaType="list" select="getDiscussOfJt"/>
+            
+     </resultMap>     
+     
+ <!-- 查询试卷详情 -->
+       <select id="getJtInfoAndDiscussWithReplay"    resultMap="jtInfoMap">
+		select * from jt where(id=#{id})
+        </select> 
+     
+	     <!-- 查询问题 -->
+   <select id="getDiscussOfJt" resultMap="getDiscussOfJtMap">
+         select *
+         from discuss_jt
+         where jtId = #{id}
+   </select> 
+	    <!-- 定义结果集  问题下的答案 -->
+       <resultMap type="com.aygxy.xlyy.user.entity.DiscussJt" id="getDiscussOfJtMap">
+           <result property="id" column="id"/>
+           <collection property="replayDiscussJts" column="id" javaType="list" select="getReplayDiscussJt"></collection>
+       </resultMap>
+	     
+        <!-- 查询问题 -->
+     <select id="getReplayDiscussJt"  parameterType="com.aygxy.xlyy.user.entity.ReplayDiscussJt" resultMap="getReplayDiscussJtMap">
+         select * from replay_discuss_jt where discussId =#{id}
+     </select> 
+     
+      <resultMap type="com.aygxy.xlyy.user.entity.ReplayDiscussJt" id="getReplayDiscussJtMap">
+           <result property="id" column="id"/>
+           <result property="replayInfo" column="replayInfo" jdbcType="VARCHAR"/>
+       </resultMap>
+       
+       
+       <!-- 发送鸡汤 -->
+     <insert id="sendJtBean" parameterType="com.aygxy.xlyy.user.entity.JtBean" 
+        useGeneratedKeys="false" > 
+        insert into jt(id,userType,userId,jtImgUrl,jtType,jtInfo,jtTime,preImage,shareTitle,shareFrom,shareUrl)  
+             values(#{id},#{userType},#{userId},#{jtImgUrl},#{jtType},#{jtInfo},#{jtTime},#{preImage},#{shareTitle},#{shareFrom},#{shareUrl})  
+             
+             
+    </insert>
+         <insert id="sendDiscussForJt" parameterType="com.aygxy.xlyy.user.entity.DiscussJt" 
+        useGeneratedKeys="false" > 
+        insert into discuss_jt(id,jtId,userType,userId,discussInfo,discussTime,discussLevel)  
+             values(#{id},#{jtId},#{userType},#{userId},#{discussInfo},#{discussTime},#{discussLevel})  
+    </insert>
+       
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aygxy.xlyy.user.dao.TeacherMapper">
+
+    <!-- 定义结果集 试卷下的问题 -->
+      <resultMap type="com.aygxy.xlyy.user.entity.TeacherInfo" id="teacherInfoMap">
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="teacherNickName" column="teacherNickName" jdbcType="VARCHAR"/>
+		<result property="userType" column="userType" jdbcType="INTEGER"/>
+		<result property="teacherIntro" column="teacherIntro" jdbcType="VARCHAR"/>
+		<result property="teacherIcon" column="teacherIcon" jdbcType="VARCHAR"/>          
+	    <collection property="discussTeachers" column="id" javaType="list" select="getDiscussOfTeacher"/>
+            
+     </resultMap>     
+     
+ <!-- 查询试卷详情 -->
+       <select id="getTeacherInfoAndDiscussWithReplay"    resultMap="teacherInfoMap">
+		select * from teacher_info where(id=#{id})
+        </select> 
+     
+     
+     <!-- 查询问题 -->
+   <select id="getDiscussOfTeacher" resultMap="getDiscussOfTeacherMap">
+         select *
+         from discuss_teacher
+         where teacherId = #{id}
+   </select>  
+   
+     <!-- 定义结果集  问题下的答案 -->
+       <resultMap type="com.aygxy.xlyy.user.entity.DiscussTeacher" id="getDiscussOfTeacherMap">
+           <result property="id" column="id"/>
+           <association property="studentInfo" column="stuId" javaType="com.aygxy.xlyy.user.entity.StudentInfo" select="getStudentInfo"></association>
+           <collection property="replayDiscussTeachers" column="id" javaType="list" select="getReplayDiscussTeacher"></collection>
+       </resultMap>
+       
+        <!-- 查询问题 -->
+     <select id="getReplayDiscussTeacher"  parameterType="com.aygxy.xlyy.user.entity.ReplayDiscussTeacher" resultMap="getReplayDiscussTeacherMap">
+         select * from replay_discuss_tea where discussId =#{id}
+     </select> 
+     
+      <resultMap type="com.aygxy.xlyy.user.entity.ReplayDiscussTeacher" id="getReplayDiscussTeacherMap">
+           <result property="id" column="id"/>
+       </resultMap>
+       
+      
+      <select id="getStudentInfo" parameterType="com.aygxy.xlyy.user.entity.StudentInfo" resultType="com.aygxy.xlyy.user.entity.StudentInfo">
+         select * from student_info where id=#{id}
+      </select>
+      
+      
+      
+     
+      <insert id="sendDiscussForTeacher" parameterType="com.aygxy.xlyy.user.entity.DiscussTeacher" 
+        useGeneratedKeys="false" > 
+        insert into discuss_teacher(id,stuId,teacherId,discussInfo,discussTime,discussLevel)  
+             values(#{id},#{stuId},#{teacherId},#{discussInfo},#{discussTime},#{discussLevel})  
+    </insert>
+      
+      
+      
+      
+      
+      
+     
+</mapper>
